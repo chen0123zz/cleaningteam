@@ -3,127 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>新北清潔隊學霸特訓 V9.5</title>
+    <title>新北清潔隊學霸特訓 V13.8</title>
     <style>
-        /* === V9.5 清潔隊專用版 (經典藍橘配色 + 提示功能) === */
+        /* === V13.8 學習閱讀優化版 === */
         body {
             font-family: "Microsoft JhengHei", "Heiti TC", sans-serif;
-            background-color: #f4f7f6; /* 經典灰白底 */
+            background-color: #fff3e0;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            color: #333;
+            color: #2d3436;
         }
         .quiz-container {
             background: white;
             padding: 30px;
             border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.08);
             width: 90%;
             max-width: 600px; 
             position: relative;
             max-height: 90vh;
-            overflow-y: auto; 
+            overflow-y: auto;
+            scroll-behavior: smooth; 
         }
-        h1 { color: #2c3e50; text-align: center; margin-bottom: 5px; letter-spacing: 1px; font-size: 1.6em; }
-        .subtitle { text-align: center; color: #7f8c8d; margin-bottom: 20px; font-size: 0.9em; }
+        h1 { color: #e67e22; text-align: center; margin-bottom: 5px; letter-spacing: 1px; font-size: 1.6em; }
+        .subtitle { text-align: center; color: #84817a; margin-bottom: 20px; font-size: 0.9em; }
         
-        /* 首頁按鈕區 */
-        .home-btn-grid { display: grid; gap: 15px; margin-top: 20px; }
+        .btn-grid { display: grid; gap: 12px; margin-top: 15px; }
         .home-btn {
-            padding: 20px; border: none; border-radius: 15px;
-            font-size: 1.1em; font-weight: bold; cursor: pointer;
+            padding: 18px; border: none; border-radius: 12px;
+            font-size: 1.05em; font-weight: bold; cursor: pointer;
             display: flex; align-items: center; justify-content: space-between;
             transition: transform 0.2s, box-shadow 0.2s;
             color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             text-decoration: none;
         }
-        .home-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 10px rgba(0,0,0,0.15); }
+        .home-btn:hover { transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.15); }
         
-        /* --- 清潔隊經典配色 --- */
-        /* 1. 開始測驗：經典藍 (專業) */
-        .btn-primary { background: linear-gradient(135deg, #3498db, #2980b9); } 
+        .btn-random { background: linear-gradient(135deg, #ff9f43, #ee5253); } 
+        .btn-chapter-mode { background: linear-gradient(135deg, #576574, #222f3e); } 
+        .btn-star { background: linear-gradient(135deg, #feca57, #ff9f43); }    
+        .btn-wrong { background: linear-gradient(135deg, #ff6b6b, #c0392b); }   
+        .btn-info { background: linear-gradient(135deg, #54a0ff, #2e86de); }
+
+        .chapter-item {
+            background: white; color: #2d3436; 
+            border: 2px solid #dfe6e9; padding: 15px;
+            border-radius: 10px; cursor: pointer;
+            display: flex; justify-content: space-between; align-items: center;
+            transition: all 0.2s; text-align: left;
+        }
+        .chapter-item:hover { background: #fff8e1; border-color: #ffeaa7; }
+        .chapter-title { font-weight: bold; font-size: 1.1em; }
+        .chapter-progress { font-size: 0.85em; color: #636e72; background: #dfe6e9; padding: 2px 8px; border-radius: 10px;}
+
+        .range-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .range-btn {
+            padding: 10px 5px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.9em;
+            cursor: pointer;
+            border: 2px solid #dfe6e9;
+            background: white;
+            position: relative; 
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 50px;
+        }
+        .range-btn:hover { transform: scale(1.05); }
+        .range-progress-text { font-size: 0.75em; color: #999; margin-top: 2px; }
         
-        /* 2. 收藏本：亮黃/橘 (醒目) */
-        .btn-star { background: linear-gradient(135deg, #f1c40f, #f39c12); }    
+        .status-new { color: #636e72; } 
+        .status-partial { background: #fff3cd; border-color: #ffecb3; color: #856404; font-weight:bold; } 
+        .status-done { background: #d1e7dd; border-color: #badbcc; color: #0f5132; font-weight:bold; } 
         
-        /* 3. 錯題本：警示紅 (注意) */
-        .btn-wrong { background: linear-gradient(135deg, #e74c3c, #c0392b); }   
-        
-        /* 4. 參考資料：青色 (資訊) */
-        .btn-info { background: linear-gradient(135deg, #17a2b8, #138496); }
+        .current-marker {
+            position: absolute; top: -8px; right: -8px; 
+            font-size: 1.2em; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2));
+        }
 
         .link-btn { background: white; color: #2c3e50; border: 1px solid #eee; justify-content: flex-start; }
         .link-btn:hover { background-color: #f8f9fa; }
         
-        .icon { font-size: 1.5em; margin-right: 10px; }
-        .count-badge { background: rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 10px; font-size: 0.8em; }
+        .icon { font-size: 1.4em; margin-right: 10px; }
+        .count-badge { background: rgba(0,0,0,0.1); padding: 4px 10px; border-radius: 15px; font-size: 0.85em; }
 
-        /* 統計數據區 */
         .stats-box {
-            background: #f8f9fa; border-radius: 12px; padding: 15px;
-            margin-bottom: 20px; text-align: center; border: 1px solid #e9ecef;
+            background: #fff3cd; border-radius: 12px; padding: 15px;
+            margin-bottom: 20px; text-align: center; border: 1px solid #ffeaa7;
         }
-        .stats-num { font-size: 1.5em; font-weight: bold; color: #2c3e50; }
-        .stats-label { font-size: 0.85em; color: #7f8c8d; }
+        .stats-num { font-size: 1.5em; font-weight: bold; color: #e67e22; }
+        .stats-label { font-size: 0.85em; color: #d35400; }
 
-        /* 測驗區樣式 */
-        .progress-bar {
-            width: 100%; height: 8px; background-color: #e9ecef;
-            border-radius: 4px; margin-bottom: 20px; overflow: hidden;
-        }
-        .progress-fill {
-            height: 100%; background: linear-gradient(90deg, #3498db, #2ecc71);
-            width: 0%; transition: width 0.4s ease;
+        .progress-bar { width: 100%; height: 8px; background-color: #f1f2f6; border-radius: 4px; margin-bottom: 20px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #ff9f43, #ee5253); width: 0%; transition: width 0.4s ease; }
+        
+        .review-header-row {
+            display: flex; 
+            justify-content: space-between; 
+            align-items: flex-start; 
+            margin-bottom: 15px; 
         }
         
-        /* 題目與按鈕排版 */
-        .question-header-row, .review-header-row {
-            display: flex; justify-content: space-between; align-items: flex-start; 
-            margin-bottom: 10px; gap: 15px; 
+        .review-q {
+            flex: 1; 
+            font-size: 1.15em; 
+            font-weight: bold; 
+            line-height: 1.5; 
+            color: #2c3e50;
+            margin-right: 15px; 
         }
-        .question-text-col, .review-q {
-            flex: 1; font-size: 1.2em; font-weight: bold; line-height: 1.5; color: #2c3e50;
-        }
+        
         .action-btn-group {
-            display: flex; flex-direction: column; gap: 8px; min-width: 90px; align-items: flex-end;
+            display: flex; 
+            gap: 12px;
+            flex-shrink: 0;
         }
-        
-        /* 小按鈕樣式 */
+
+        .question-header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; gap: 15px; }
+        .question-text-col { flex: 1; font-size: 1.2em; font-weight: bold; line-height: 1.5; color: #2c3e50; }
+
         .btn-action-sm {
-            padding: 6px 12px; border-radius: 20px; font-size: 0.85em;
-            cursor: pointer; border: 1px solid #ccc; background: white;
-            white-space: nowrap; text-align: center; transition: all 0.2s;
+            width: 40px; height: 40px; 
+            border-radius: 8px; 
+            font-size: 1.2em; 
+            cursor: pointer;
+            border: 1px solid #bdc3c7; background: white; 
+            display: flex; align-items: center; justify-content: center;
+            padding: 0;
+            transition: all 0.2s;
         }
         .btn-action-sm:active { transform: scale(0.95); }
 
         .options-grid { display: grid; gap: 10px; margin-top:15px; }
         .btn-option {
-            padding: 15px 20px; border: 2px solid #edf2f7; border-radius: 10px;
+            padding: 15px 20px; border: 2px solid #f1f2f6; border-radius: 10px;
             background: white; cursor: pointer; font-size: 1em; text-align: left;
-            transition: all 0.2s; color: #4a5568; position: relative;
+            transition: all 0.2s; color: #555; position: relative;
         }
-        .btn-option:hover { border-color: #cbd5e0; background-color: #f8fafc; }
-        .btn-option.selected {
-            border-color: #3498db; background-color: #ebf8ff; color: #2b6cb0; font-weight: bold;
-        }
+        .btn-option:hover { border-color: #ff9f43; background-color: #fff3e0; }
+        .btn-option.selected { border-color: #e67e22; background-color: #ffe0b2; color: #d35400; font-weight: bold; }
 
-        /* ⭐ V9.0 新增：提示區塊樣式 (預設隱藏) ⭐ */
         .hint-container {
-            margin-top: 15px;
-            padding: 10px;
-            background-color: #fff3cd; /* 淡黃色背景 */
-            border: 1px solid #ffeeba;
-            border-radius: 8px;
-            color: #856404;
-            font-size: 0.95em;
-            display: none; 
+            margin-top: 15px; padding: 12px; background-color: #fff8e1;
+            border-left: 4px solid #ffc107; border-radius: 4px;
+            color: #795548; font-size: 0.95em; display: none; line-height: 1.5;
         }
         .btn-hint {
-            background-color: #ffc107; color: #333; border: none;
-            padding: 5px 10px; border-radius: 15px; font-size: 0.85em; cursor: pointer;
+            background-color: #fffa65; color: #4b4b4b; border: 1px solid #fff200;
+            padding: 5px 12px; border-radius: 20px; font-size: 0.85em; cursor: pointer;
             margin-top: 5px; display: inline-block; font-weight: bold;
         }
 
@@ -134,25 +173,33 @@
             color: white; transition: opacity 0.2s;
         }
         .nav-btn:hover { opacity: 0.9; }
-        
         .btn-prev { background-color: #95a5a6; }
-        .btn-next { background-color: #3498db; }
-        .btn-submit { background: linear-gradient(135deg, #e67e22 0%, #d35400 100%); color: white; }
+        .btn-next { background-color: #ff9f43; } 
+        .btn-submit { background: linear-gradient(135deg, #f39c12, #d35400); color: white; }
         .btn-home { background-color: #7f8c8d; margin-top: 10px; width: 100%; }
 
-        /* 結果列表 */
-        .review-item {
-            background: white; border-radius: 10px; padding: 15px;
-            margin-bottom: 15px; border: 1px solid #e2e8f0; position: relative;
+        .review-item { background: white; border-radius: 10px; padding: 15px; margin-bottom: 15px; border: 1px solid #f1f2f6; position: relative; }
+        .review-item.correct { border-left: 5px solid #1abc9c; } 
+        .review-item.wrong { border-left: 5px solid #ff6b6b; }   
+        .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+
+        .float-btn-group {
+            position: fixed; 
+            bottom: 30px; right: 20px; 
+            display: flex; flex-direction: column; gap: 12px;
+            z-index: 99999; opacity: 0.6; transition: opacity 0.3s;
         }
-        .review-item.correct { border-left: 5px solid #27ae60; }
-        .review-item.wrong { border-left: 5px solid #e74c3c; }
-        
-        /* 頂部導航列 */
-        .top-nav {
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;
-            border-bottom: 1px solid #eee; padding-bottom: 10px;
+        .float-btn-group:hover { opacity: 1; }
+        .float-btn {
+            width: 45px; height: 45px; border-radius: 50%;
+            background: rgba(45, 52, 54, 0.9); 
+            color: white; border: 1px solid rgba(255,255,255,0.2);
+            font-size: 1.2em; cursor: pointer; 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            display: flex; align-items: center; justify-content: center;
+            backdrop-filter: blur(5px);
         }
+        .float-btn:active { transform: scale(0.95); }
     </style>
 </head>
 <body>
@@ -166,115 +213,116 @@
         <div class="stats-num" id="home-progress-stats">0 / 0 題 (0%)</div>
     </div>
 
-    <div class="home-btn-grid">
-        <button class="home-btn btn-primary" onclick="startNormalQuiz()">
-            <div><span class="icon">📝</span>開始隨機測驗</div>
+    <div class="btn-grid">
+        <button class="home-btn btn-random" onclick="startRandomQuiz()">
+            <div><span class="icon">🎲</span>綜合隨機測驗</div>
             <span class="count-badge">抽 10 題</span>
         </button>
-        
+
+        <button class="home-btn btn-chapter-mode" onclick="openChapterMenu()">
+            <div><span class="icon">📚</span>章節地毯式練習</div>
+            <span class="count-badge">2 大章節</span>
+        </button>
+
         <button class="home-btn btn-star" onclick="openNotebook('star')">
             <div><span class="icon">⭐</span>重點收藏本</div>
             <span class="count-badge" id="btn-star-count">0 題</span>
         </button>
-        
         <button class="home-btn btn-wrong" onclick="openNotebook('mistake')">
             <div><span class="icon">📖</span>歷史錯題本</div>
             <span class="count-badge" id="btn-mistake-count">0 題</span>
         </button>
-
+        
         <button class="home-btn btn-info" onclick="openReference()">
-            <div><span class="icon">📚</span>參考資料與簡章</div>
-            <span class="count-badge">4 個連結</span>
+            <div><span class="icon">🔗</span>參考資料與簡章</div>
+            <span class="count-badge">3 個連結</span>
         </button>
+    </div>
 
-        <div style="margin-top:20px; border-top:1px solid #eee; padding-top:15px; text-align:center;">
-            <button class="nav-btn" style="background-color: #bdc3c7; color: #555; font-size: 0.9em; width:auto; padding:8px 15px;" onclick="clearAllData()">
-                🗑️ 重置所有紀錄
-            </button>
-        </div>
+    <div style="margin-top:20px; border-top:1px solid #eee; padding-top:15px; text-align:center;">
+        <button class="nav-btn" style="background-color: #bdc3c7; color: #555; font-size: 0.9em; width:auto; padding:8px 15px;" onclick="clearAllData()">🗑️ 重置所有紀錄</button>
     </div>
 </div>
 
+<div class="quiz-container" id="chapter-menu-view" style="display: none;">
+    <div class="top-nav">
+        <div style="font-weight:bold; color:#2d3436;">📚 選擇章節</div>
+        <button onclick="goHome()" style="background:none; border:none; color:#999; cursor:pointer;">🏠 回首頁</button>
+    </div>
+    <div id="chapter-list" class="btn-grid"></div>
+</div>
+
+<div class="quiz-container" id="range-menu-view" style="display: none;">
+    <div class="top-nav">
+        <div style="font-weight:bold; color:#2d3436;" id="range-menu-title">章節名稱</div>
+        <button onclick="openChapterMenu()" style="background:none; border:none; color:#999; cursor:pointer;">↩️ 回章節</button>
+    </div>
+    <div style="margin-bottom:10px; color:#636e72; font-size:0.9em;">
+        請選擇練習範圍 (10題一組)：<br>
+        <span style="color:#0f5132;">■</span> 已完成 
+        <span style="color:#856404;">■</span> 進行中 
+        <span style="color:#636e72;">□</span> 未開始
+    </div>
+    <div id="range-list" class="range-grid"></div>
+</div>
+
 <div class="quiz-container" id="reference-view" style="display: none;">
-    <div class="score-header" style="padding: 30px 20px; background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); color:white; border-radius:15px; text-align:center;">
-        <div style="font-size: 1.2em; opacity: 0.9;">參考資料區</div>
-        <div style="font-size: 1.8em; font-weight: bold; margin-top:10px;">官方簡章 & 題庫</div>
+    <div class="score-header" style="padding: 30px 20px; background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); color:white; border-radius:15px; text-align:center;">
+        <div style="font-size: 1.2em; opacity: 0.9;">參考資料區</div><div style="font-size: 1.8em; font-weight: bold; margin-top:10px;">官方簡章 & 題庫</div>
     </div>
-
     <div class="home-btn-grid" style="margin-top:20px;">
-        <a href="https://reurl.cc/OR4MNy" target="_blank" class="home-btn link-btn">
-            <div><span class="icon">📄</span> 113招考簡章</div>
-        </a>
-        <a href="https://reurl.cc/3bovNV" target="_blank" class="home-btn link-btn">
-            <div><span class="icon">📂</span> 113招考題庫</div>
-        </a>
-        <a href="https://reurl.cc/W81x5x" target="_blank" class="home-btn link-btn">
-            <div><span class="icon">📝</span> 113年度筆試考卷</div>
-        </a>
-        <a href="https://docs.google.com/spreadsheets/d/1XyZhLT2sVuMCMVdWfSCo_21GbxuOcEBz/edit?usp=sharing&ouid=101128035191979045230&rtpof=true&sd=true" target="_blank" class="home-btn link-btn">
-            <div><span class="icon">📊</span> 113題庫地毯式測驗</div>
-        </a>
+        <a href="https://reurl.cc/OR4MNy" target="_blank" class="home-btn link-btn"><div><span class="icon">📄</span> 113招考簡章</div></a>
+        <a href="https://reurl.cc/3bovNV" target="_blank" class="home-btn link-btn"><div><span class="icon">📂</span> 113招考題庫</div></a>
+        <a href="https://reurl.cc/W81x5x" target="_blank" class="home-btn link-btn"><div><span class="icon">📝</span> 113年度考卷</div></a>
     </div>
-
     <button class="nav-btn btn-home" onclick="goHome()" style="margin-top:30px;">🏠 返回首頁</button>
 </div>
 
 <div class="quiz-container" id="quiz-view" style="display: none;">
-    <div class="top-nav">
-        <div id="quiz-mode-badge" style="font-weight:bold; color:#3498db;">隨機測驗</div>
-        <button onclick="goHome()" style="background:none; border:none; color:#999; cursor:pointer; font-size:0.9em;">🏠 回首頁</button>
-    </div>
-    
+    <div class="top-nav"><div id="quiz-mode-badge" style="font-weight:bold; color:#e67e22;">隨機測驗</div><button onclick="goHome()" style="background:none; border:none; color:#999; cursor:pointer; font-size:0.9em;">🏠 回首頁</button></div>
     <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
-    
     <div id="question-area"></div>
-
-    <div class="controls">
-        <button class="nav-btn btn-prev" id="btn-prev" onclick="prevQuestion()">上一題</button>
-        <button class="nav-btn btn-next" id="btn-next" onclick="nextQuestion()">下一題</button>
-    </div>
+    <div class="controls"><button class="nav-btn btn-prev" id="btn-prev" onclick="prevQuestion()">上一題</button><button class="nav-btn btn-next" id="btn-next" onclick="nextQuestion()">下一題</button></div>
 </div>
 
 <div class="quiz-container" id="notebook-view" style="display: none;">
-    <div class="score-header" id="notebook-header" style="padding: 30px 20px; color:white; border-radius:15px; text-align:center; margin-bottom:20px;">
-        <div style="font-size: 1.2em; opacity: 0.9;" id="notebook-title">標題</div>
-        <div style="font-size: 2em; font-weight: bold; margin-top:10px;" id="notebook-stats">0 題</div>
-        
+    <div class="score-header" id="notebook-header" style="padding: 30px 20px; color:white; border-radius:15px; text-align:center; margin-bottom:20px;"><div style="font-size: 1.2em;" id="notebook-title">標題</div><div style="font-size: 2em; font-weight: bold;" id="notebook-stats">0 題</div>
         <div style="margin-top:15px; display:flex; gap:10px; justify-content:center;">
-             <button style="background:rgba(255,255,255,0.25); border:1px solid white; color:white; padding:8px 15px; border-radius:20px; cursor:pointer; font-size:0.9em;" onclick="clearCurrentNotebook()">
-                🗑️ 清空此本
-            </button>
-             <button style="background:white; border:none; color:#333; padding:8px 20px; border-radius:20px; cursor:pointer; font-weight:bold;" onclick="startNotebookQuiz()">
-                💪 抽 10 題測驗
-            </button>
+             <button style="background:rgba(255,255,255,0.25); border:1px solid white; color:white; padding:8px 15px; border-radius:20px; cursor:pointer; font-size:0.9em;" onclick="clearCurrentNotebook()">🗑️ 清空此本</button>
+             <button style="background:white; border:none; color:#333; padding:8px 20px; border-radius:20px; cursor:pointer; font-weight:bold;" onclick="startNotebookQuiz()">💪 抽 10 題測驗</button>
         </div>
     </div>
-    
     <div id="notebook-list" style="margin-top:20px;"></div>
+    
+    <div class="float-btn-group">
+        <button class="float-btn" onclick="scrollToTop()">▲</button>
+        <button class="float-btn" onclick="scrollToBottom()">▼</button>
+    </div>
     
     <button class="nav-btn btn-home" onclick="goHome()">🏠 返回首頁</button>
 </div>
 
 <div class="quiz-container" id="result-view" style="display: none;">
-    <div class="score-header" style="padding: 30px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:white; border-radius:15px; text-align:center; margin-bottom:20px;">
-        <div style="font-size: 1.2em; opacity: 0.9;">你的成績</div>
-        <div class="score-number" id="final-score">0</div>
-        <div id="score-comment" style="margin-top:10px; font-size:1.2em; font-weight:bold;"></div>
+    <div class="score-header" style="padding: 30px 20px; background: linear-gradient(135deg, #ff9f43 0%, #e67e22 100%); color:white; border-radius:15px; text-align:center; margin-bottom:20px;">
+        <div style="font-size: 1.2em; opacity: 0.9;">你的成績</div><div class="score-number" id="final-score">0</div><div id="score-comment" style="margin-top:10px; font-size:1.2em; font-weight:bold;"></div>
     </div>
-    
     <div style="margin-bottom: 15px; display:flex; gap:10px; justify-content: center;">
         <button id="btn-filter-all" class="nav-btn" style="background-color: #34495e;" onclick="filterReview('all')">顯示全部</button>
-        <button id="btn-filter-wrong" class="nav-btn" style="background-color: #e74c3c; opacity: 0.6;" onclick="filterReview('wrong')">只看錯題 ❌</button>
+        <button id="btn-filter-wrong" class="nav-btn" style="background-color: #ff6b6b; opacity: 0.6;" onclick="filterReview('wrong')">只看錯題 ❌</button>
     </div>
-
     <div id="review-list"></div>
+    
+    <div class="float-btn-group">
+        <button class="float-btn" onclick="scrollToTop()">▲</button>
+        <button class="float-btn" onclick="scrollToBottom()">▼</button>
+    </div>
     
     <div id="result-buttons" style="margin-top:20px; display:flex; flex-direction:column; gap:10px;"></div>
 </div>
 
 <script>
     // ==========================================
-    // 1. 題庫資料區 
+    // 1. 題庫資料區
     // ==========================================
     const database = [
         {
@@ -14368,55 +14416,180 @@
         }
     ];
 
+
     // ==========================================
-    // 2. 程式邏輯區 (V9.5)
+    // 2. 章節設定 (清潔隊專用)
+    // ==========================================
+    const chapterConfig = [
+        { title: "一、環保常識類", count: 859 },
+        { title: "二、廉政及職業安全衛生類", count: 315 }
+    ];
+
+    // ==========================================
+    // 3. 程式邏輯區 (V13.7 學習優化版)
     // ==========================================
 
-    // 初始化
     database.forEach((item, index) => { item.id = index; });
 
     let currentQuiz = [];
     let userAnswers = [];
     let currentQuestionIndex = 0;
-    const quizSize = 10; 
+    const randomQuizSize = 10; 
     let currentMode = 'normal'; 
-    
-    const STORAGE_KEY_PROGRESS = 'cleaner_progress_v1'; 
-    const STORAGE_KEY_MISTAKES = 'cleaner_mistakes_v1'; 
-    const STORAGE_KEY_STARS = 'cleaner_stars_v1';
+    let chapterRanges = [];
+    let currentChapterIndex = 0; 
 
-    function getStorage(key) {
-        const data = localStorage.getItem(key);
-        return data ? JSON.parse(data) : [];
-    }
+    // ⭐ 清潔隊專用 Storage Key
+    const STORAGE_KEY_PROGRESS = 'cleaner_progress_v13'; 
+    const STORAGE_KEY_MISTAKES = 'cleaner_mistakes_v13'; 
+    const STORAGE_KEY_STARS = 'cleaner_stars_v13';
 
-    function setStorage(key, data) {
-        localStorage.setItem(key, JSON.stringify(data));
-    }
+    function getStorage(key) { const data = localStorage.getItem(key); return data ? JSON.parse(data) : []; }
+    function setStorage(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
 
     function initApp() {
-        goHome();
+        calculateChapterRanges();
+        renderChapterMenu();
+        updateHomeStats();
+        document.getElementById('home-view').style.display = 'block';
     }
-    
+
+    function scrollToTop() {
+        const visibleContainer = document.querySelector('.quiz-container[style*="display: block"]');
+        if (visibleContainer) { visibleContainer.scrollTop = 0; }
+        else { window.scrollTo(0, 0); }
+    }
+
+    function scrollToBottom() {
+        const visibleContainer = document.querySelector('.quiz-container[style*="display: block"]');
+        if (visibleContainer) { visibleContainer.scrollTop = visibleContainer.scrollHeight; }
+        else { window.scrollTo(0, document.body.scrollHeight); }
+    }
+
+    function calculateChapterRanges() {
+        let startIndex = 0;
+        chapterRanges = chapterConfig.map(chapter => {
+            let end = startIndex + chapter.count;
+            let range = { start: startIndex, end: end - 1, title: chapter.title, count: chapter.count };
+            startIndex = end;
+            return range;
+        });
+    }
+
+    function renderChapterMenu() {
+        const container = document.getElementById('chapter-list');
+        const history = getStorage(STORAGE_KEY_PROGRESS);
+        let html = '';
+        
+        chapterRanges.forEach((chapter, idx) => {
+            let doneCount = 0;
+            let realCount = 0; 
+            for(let i = chapter.start; i <= chapter.end; i++) {
+                if (database[i]) {
+                    realCount++;
+                    if(history.includes(i)) doneCount++;
+                }
+            }
+            
+            let progressText = '0 / 0 題 (0%)';
+            let opacityStyle = 'opacity:0.5; cursor:default;';
+            let clickAction = '';
+
+            if (realCount > 0) {
+                let percent = Math.round((doneCount / realCount) * 100);
+                progressText = `<span style="color:#e67e22; font-weight:bold;">${doneCount}</span> / ${realCount} 題 (${percent}%)`;
+                opacityStyle = '';
+                clickAction = `onclick="openRangeMenu(${idx})"`;
+            }
+            
+            html += `
+                <div class="chapter-item" ${clickAction} style="${opacityStyle}">
+                    <div>
+                        <div class="chapter-title">${chapter.title}</div>
+                    </div>
+                    <div class="chapter-progress">${progressText}</div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    }
+
+    function openRangeMenu(chapterIdx) {
+        currentChapterIndex = chapterIdx;
+        hideAllViews();
+        document.getElementById('range-menu-view').style.display = 'block';
+        
+        const chapter = chapterRanges[chapterIdx];
+        document.getElementById('range-menu-title').textContent = chapter.title;
+        
+        renderRangeGrid(chapter);
+        scrollToTop();
+    }
+
+    function renderRangeGrid(chapter) {
+        const container = document.getElementById('range-list');
+        const history = getStorage(STORAGE_KEY_PROGRESS);
+        let html = '';
+        const step = 10;
+        for (let i = chapter.start; i <= chapter.end; i += step) {
+            if (!database[i]) break;
+            let rangeEnd = Math.min(i + step - 1, chapter.end);
+            while(rangeEnd >= i && !database[rangeEnd]) rangeEnd--;
+            if (rangeEnd < i) break;
+
+            let rangeTotal = rangeEnd - i + 1;
+            let rangeDoneCount = 0;
+            for(let k = i; k <= rangeEnd; k++) {
+                if(history.includes(k)) rangeDoneCount++;
+            }
+            
+            let statusClass = 'status-new';
+            let progressLabel = `<div class="range-progress-text">${rangeDoneCount}/${rangeTotal}</div>`;
+
+            if (rangeDoneCount === rangeTotal) {
+                statusClass = 'status-done'; 
+                progressLabel = '<div class="range-progress-text" style="color:#0f5132;">✔</div>';
+            } else if (rangeDoneCount > 0) {
+                statusClass = 'status-partial'; 
+            }
+
+            let labelStart = i - chapter.start + 1;
+            let labelEnd = rangeEnd - chapter.start + 1;
+
+            html += `
+                <div class="range-btn ${statusClass}" onclick="startRangeQuiz(${i}, ${rangeEnd}, '${chapter.title} ${labelStart}-${labelEnd}')">
+                    ${labelStart}~${labelEnd}
+                    ${progressLabel}
+                </div>
+            `;
+        }
+        container.innerHTML = html;
+    }
+
     function hideAllViews() {
-        document.getElementById('home-view').style.display = 'none';
-        document.getElementById('quiz-view').style.display = 'none';
-        document.getElementById('notebook-view').style.display = 'none';
-        document.getElementById('result-view').style.display = 'none';
-        document.getElementById('reference-view').style.display = 'none';
+        ['home-view', 'chapter-menu-view', 'range-menu-view', 'quiz-view', 'notebook-view', 'result-view', 'reference-view'].forEach(id => {
+            document.getElementById(id).style.display = 'none';
+        });
     }
 
     function goHome() {
         hideAllViews();
         document.getElementById('home-view').style.display = 'block';
         updateHomeStats();
-        window.scrollTo(0, 0);
+        scrollToTop();
     }
 
     function openReference() {
         hideAllViews();
         document.getElementById('reference-view').style.display = 'block';
-        window.scrollTo(0, 0);
+        scrollToTop();
+    }
+    
+    function openChapterMenu() {
+        hideAllViews();
+        document.getElementById('chapter-menu-view').style.display = 'block';
+        renderChapterMenu();
+        scrollToTop();
     }
 
     function updateHomeStats() {
@@ -14425,8 +14598,11 @@
         const stars = getStorage(STORAGE_KEY_STARS);
         const total = database.length;
         
+        // 總進度還是保留百分比，因為這很有成就感
         const percent = total > 0 ? ((progress.length / total) * 100).toFixed(1) : 0;
         document.getElementById('home-progress-stats').textContent = `${progress.length} / ${total} 題 (${percent}%)`;
+        
+        // 收藏本與錯題本，只顯示「幾題」
         document.getElementById('btn-star-count').textContent = `${stars.length} 題`;
         document.getElementById('btn-mistake-count').textContent = `${mistakes.length} 題`;
     }
@@ -14445,10 +14621,10 @@
         const stats = document.getElementById('notebook-stats');
         
         if (isStar) {
-            header.style.background = 'linear-gradient(135deg, #f1c40f 0%, #f39c12 100%)';
+            header.style.background = 'linear-gradient(135deg, #f39c12 0%, #d35400 100%)';
             title.textContent = '⭐ 重點收藏本';
         } else {
-            header.style.background = 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)';
+            header.style.background = 'linear-gradient(135deg, #ff6b6b 0%, #ee5253 100%)';
             title.textContent = '📖 歷史錯題本';
         }
         stats.textContent = `共 ${ids.length} 題`;
@@ -14463,132 +14639,177 @@
                 if (!q) return;
                 
                 let optionsAndAnalysisHtml = '';
+
+                // ⭐ V13.7 修改：選項下方直接顯示解析
                 q.options.forEach((opt, i) => {
                     const isAns = (i === q.ans);
-                    const color = isAns ? '#27ae60' : '#333';
-                    const weight = isAns ? 'bold' : 'normal';
+                    // 設定正確答案樣式
+                    let bg = isAns ? '#e0f2f1' : '#fff';
+                    let border = isAns ? '2px solid #1abc9c' : '1px solid #eee';
+                    let mark = isAns ? '✅' : '';
+                    let titleColor = isAns ? '#1abc9c' : '#333';
                     
-                    // V9.5 改良：如果是一行解析，直接顯示；如果是多行解析陣列，分項顯示
-                    let analysisText = "";
-                    if (Array.isArray(q.analysis)) {
-                        // 如果解析是陣列 (像測量助理那樣)
-                        analysisText = q.analysis[i] || "";
-                    } else {
-                        // 如果解析是字串 (像清潔隊原本那樣)，只在正確選項下顯示，或最後統一顯示
-                        // 這裡為了相容舊格式，如果解析是字串，我們暫時不分項顯示在選項下，而是保留原本邏輯
-                        if(isAns) analysisText = q.analysis; 
+                    // 取得該選項的解析 (如果有的話)
+                    let analysisText = '';
+                    if (Array.isArray(q.analysis) && q.analysis[i]) {
+                        analysisText = q.analysis[i];
+                    } else if (!Array.isArray(q.analysis) && isAns) {
+                        // 如果解析不是陣列，且是正確答案，就顯示該解析
+                        analysisText = q.analysis;
                     }
-                    
+
                     optionsAndAnalysisHtml += `
-                        <div style="margin-bottom:10px;">
-                            <div style="color:${color}; font-weight:${weight}; font-size:1.05em;">
-                                ${String.fromCharCode(65+i)}. ${opt} ${isAns?'✅':''}
-                            </div>
-                            ${analysisText ? `<div style="margin-top:4px; font-size:0.9em; color:#666; background:#f4f6f9; padding:6px 10px; border-radius:6px;">💡 ${analysisText}</div>` : ''}
+                        <div style="margin-bottom:10px; padding:10px; background:${bg}; border:${border}; border-radius:8px;">
+                            <div style="font-weight:bold; color:${titleColor}; margin-bottom:5px;">${String.fromCharCode(65+i)}. ${opt} ${mark}</div>
+                            ${analysisText ? `<div style="font-size:0.9em; color:#666; padding-top:5px; border-top:1px dashed #ccc;">💡 ${analysisText}</div>` : ''}
                         </div>
                     `;
                 });
 
-                const btnText = isStar ? '❌ 移除收藏' : '✅ 我學會了 (移除)';
-                const btnBorder = isStar ? '#f1c40f' : '#27ae60';
-                const btnTextColor = isStar ? '#f1c40f' : '#27ae60';
+                const isStarred = getStorage(STORAGE_KEY_STARS).includes(q.id);
+                const starText = isStarred ? '⭐' : '☆';
+                const starBorder = isStarred ? '#f39c12' : '#1abc9c';
+                const starColor = isStarred ? '#f39c12' : '#1abc9c';
+                
+                let removeBtn = '';
+                let starBtn = `<button class="btn-action-sm" style="border:1px solid ${starBorder}; color:${starColor};" onclick="toggleStarInNotebook(this, ${q.id})">${starText}</button>`;
+
+                if (isStar) {
+                     removeBtn = `<button class="btn-action-sm" style="border:1px solid #f39c12; color:#f39c12;" onclick="removeFromNotebook(${q.id})">⭐</button>`;
+                     starBtn = ''; 
+                } else {
+                     removeBtn = `<button class="btn-action-sm" style="border:1px solid #ff6b6b; color:#ff6b6b;" onclick="removeFromNotebook(${q.id})">🗑️</button>`;
+                }
+
+                let imageHtml = q.img ? `<div style="text-align:center; margin:10px 0;"><img src="${q.img}" style="max-width:100%; max-height:200px; border-radius:5px;"></div>` : '';
 
                 html += `
-                    <div class="review-item" style="border-left: 5px solid ${isStar?'#f1c40f':'#e74c3c'};">
+                    <div class="review-item" style="border-left: 5px solid ${isStar?'#f39c12':'#ff6b6b'};">
                         <div class="review-header-row">
                             <div class="review-q">[${isStar?'收藏':'錯題'}] ${q.q}</div>
                             <div class="action-btn-group">
-                                <button class="btn-action-sm" style="border:1px solid ${btnBorder}; color:${btnTextColor};" onclick="removeFromNotebook(${q.id})">${btnText}</button>
+                                ${starBtn}
+                                ${removeBtn}
                             </div>
                         </div>
-                        <div style="margin-left:10px; margin-bottom:10px;">${optionsAndAnalysisHtml}</div>
+                        ${imageHtml}
+                        <div style="margin-top:10px;">${optionsAndAnalysisHtml}</div>
                     </div>
                 `;
             });
             listDiv.innerHTML = html;
         }
-        window.scrollTo(0, 0);
+        scrollToTop();
+    }
+    
+    function toggleStarInNotebook(btn, qid) {
+        let stars = getStorage(STORAGE_KEY_STARS);
+        const idx = stars.indexOf(qid);
+        if (idx === -1) {
+            stars.push(qid);
+            btn.textContent = '⭐';
+            btn.style.color = '#f39c12';
+            btn.style.borderColor = '#f39c12';
+        } else {
+            stars.splice(idx, 1);
+            btn.textContent = '☆';
+            btn.style.color = '#1abc9c';
+            btn.style.borderColor = '#1abc9c';
+        }
+        setStorage(STORAGE_KEY_STARS, stars);
     }
 
     function clearCurrentNotebook() {
         const isStar = (currentMode === 'star');
         const key = isStar ? STORAGE_KEY_STARS : STORAGE_KEY_MISTAKES;
         const name = isStar ? '重點收藏本' : '歷史錯題本';
-        
-        if (getStorage(key).length === 0) {
-            alert('目前本子是空的喔！');
-            return;
-        }
-
-        if(confirm(`確定要清空「${name}」的所有題目嗎？\n此動作無法復原喔！`)) {
-            localStorage.removeItem(key);
-            openNotebook(currentMode); 
-            alert('已清空！');
-        }
+        if (getStorage(key).length === 0) { alert('目前本子是空的喔！'); return; }
+        if(confirm(`⚠️ 確定要清空「${name}」的所有題目嗎？此動作無法復原！`)) { localStorage.removeItem(key); openNotebook(currentMode); alert('已清空！'); }
     }
 
     function removeFromNotebook(id) {
         const key = (currentMode === 'star') ? STORAGE_KEY_STARS : STORAGE_KEY_MISTAKES;
-        let ids = getStorage(key);
-        ids = ids.filter(x => x !== id);
-        setStorage(key, ids);
-        openNotebook(currentMode); 
+        let msg = "確定要移除嗎？";
+        if (currentMode === 'star') { msg = "確定要取消收藏嗎？"; } 
+        else { msg = "確定要移除錯題嗎?要學會再移除喔!"; }
+
+        if(!confirm(msg)) return;
+        let ids = getStorage(key); ids = ids.filter(x => x !== id); setStorage(key, ids); openNotebook(currentMode); 
     }
 
     function startNotebookQuiz() {
         const key = (currentMode === 'star') ? STORAGE_KEY_STARS : STORAGE_KEY_MISTAKES;
         const ids = getStorage(key);
-        if (ids.length === 0) {
-            alert('目前沒有題目可以測驗喔！');
-            return;
+        if (ids.length === 0) { alert('目前沒有題目可以測驗喔！'); return; }
+        let shuffledIds = [...ids].sort(() => 0.5 - Math.random());
+        let selectedIds = shuffledIds.slice(0, 10);
+        startQuiz(currentMode, selectedIds, false); 
+    }
+
+    function getRandomQuestions(poolIds, count) {
+        let selected = [];
+        let shuffled = [...poolIds].sort(() => 0.5 - Math.random());
+        for (let id of shuffled) {
+            if (selected.length >= count) break;
+            if (selected.includes(id)) continue;
+            const q = database[id];
+            if (q.group) {
+                const groupMembers = database.filter(item => item.group === q.group).map(item => item.id);
+                groupMembers.forEach(memberId => {
+                    if (!selected.includes(memberId)) selected.push(memberId);
+                });
+            } else {
+                selected.push(id);
+            }
         }
-        startQuiz(currentMode, ids);
+        selected.sort((a, b) => a - b);
+        return selected;
     }
 
-    function startNormalQuiz() {
+    function startRandomQuiz() {
         const allIds = database.map(q => q.id);
-        startQuiz('normal', allIds);
+        const selectedIds = getRandomQuestions(allIds, randomQuizSize);
+        startQuiz('random', selectedIds, false); 
     }
 
-    function startQuiz(mode, sourceIds) {
+    function startRangeQuiz(startId, endId, title) {
+        const ids = [];
+        for (let i = startId; i <= endId; i++) ids.push(i);
+        startQuiz('range', ids, false, title);
+    }
+
+    function startQuiz(mode, sourceIds, shuffle = true, title = '') {
         currentMode = mode;
         hideAllViews();
         document.getElementById('quiz-view').style.display = 'block';
         
         const badge = document.getElementById('quiz-mode-badge');
-        if (mode === 'normal') {
-            badge.textContent = '🎲 隨機測驗 (10題)';
-            badge.style.color = '#3498db';
-        } else if (mode === 'star') {
-            badge.textContent = '⭐ 收藏題測驗';
-            badge.style.color = '#f1c40f';
-        } else {
-            badge.textContent = '📖 錯題複習測驗';
-            badge.style.color = '#e74c3c';
-        }
+        if (mode === 'random') { badge.textContent = '🎲 隨機測驗'; badge.style.color = '#ff9f43'; }
+        else if (mode === 'range') { badge.textContent = `📚 ${title}`; badge.style.color = '#34495e'; }
+        else if (mode === 'star') { badge.textContent = '⭐ 收藏測驗 (隨機10題)'; badge.style.color = '#f39c12'; }
+        else { badge.textContent = '📖 錯題測驗 (隨機10題)'; badge.style.color = '#ff6b6b'; }
 
-        let pool = sourceIds.map(id => database[id]).filter(q => q !== undefined);
-        pool.sort(() => 0.5 - Math.random());
-        currentQuiz = pool.slice(0, quizSize);
-        
+        let finalIds = [...sourceIds];
+        if (shuffle) { finalIds.sort(() => 0.5 - Math.random()); }
+
+        currentQuiz = finalIds.map(id => database[id]);
         userAnswers = new Array(currentQuiz.length).fill(null);
         currentQuestionIndex = 0;
-        
         renderQuestion();
         updateProgress();
+        scrollToTop();
     }
 
     function renderQuestion() {
         const q = currentQuiz[currentQuestionIndex];
         const area = document.getElementById('question-area');
         const totalQ = currentQuiz.length;
-        
         const stars = getStorage(STORAGE_KEY_STARS);
         const isStarred = stars.includes(q.id);
-        const starText = isStarred ? '⭐ 已收藏' : '☆ 收藏';
-        const starColor = isStarred ? '#f1c40f' : '#999';
+        const starText = isStarred ? '⭐' : '☆';
+        const starBorder = isStarred ? '#f39c12' : '#bdc3c7';
+        const starColor = isStarred ? '#f39c12' : '#999';
         const starBg = isStarred ? '#fffcf5' : '#fff';
-        const starBorder = isStarred ? '#f1c40f' : '#ccc';
 
         let optionsHtml = '';
         q.options.forEach((opt, idx) => {
@@ -14596,190 +14817,104 @@
             optionsHtml += `<div class="btn-option ${isSelected}" onclick="selectAnswer(${idx})">${String.fromCharCode(65+idx)}. ${opt}</div>`;
         });
 
-        // ⭐ V9.5 新增：提示功能 HTML (如果有提示才顯示)
-        let hintHtml = '';
-        if (q.hint) {
-            hintHtml = `
-                <div style="margin-top:10px; text-align:left;">
-                    <button class="btn-hint" onclick="toggleHint()">💡 顯示提示</button>
-                    <div id="hint-box" class="hint-container">${q.hint}</div>
-                </div>
-            `;
-        }
+        let imageHtml = q.img ? `<div style="text-align:center; margin:15px 0;"><img src="${q.img}" style="max-width:100%; max-height:300px; border-radius:5px;"></div>` : '';
+        let hintHtml = q.hint ? `<div style="margin-top:10px; text-align:left;"><button class="btn-hint" onclick="toggleHint()">💡 顯示提示</button><div id="hint-box" class="hint-container">${q.hint}</div></div>` : '';
 
         area.innerHTML = `
             <div class="question-box">
                  <div class="question-header-row">
-                    <div style="color:#3498db; font-weight:bold;">第 ${currentQuestionIndex + 1} / ${totalQ} 題</div>
+                    <div style="color:#e67e22; font-weight:bold;">第 ${currentQuestionIndex + 1} / ${totalQ} 題</div>
                     <div class="action-btn-group">
                         <button onclick="toggleStarInQuiz(${q.id})" class="btn-action-sm" style="border:1px solid ${starBorder}; color:${starColor}; background:${starBg};">${starText}</button>
                     </div>
                 </div>
                 <div class="question-text">${q.q}</div>
+                ${imageHtml}
                 ${hintHtml}
             </div>
             <div class="options-grid">${optionsHtml}</div>
         `;
-
         document.getElementById('btn-prev').disabled = (currentQuestionIndex === 0);
         const nextBtn = document.getElementById('btn-next');
-        
         nextBtn.className = 'nav-btn btn-next';
         if (currentQuestionIndex === totalQ - 1) {
-            nextBtn.textContent = '交卷查看成績 🏆';
-            nextBtn.classList.add('btn-submit'); 
-            nextBtn.onclick = submitQuiz;
+            nextBtn.textContent = '交卷查看成績 🏆'; nextBtn.classList.add('btn-submit'); nextBtn.onclick = submitQuiz;
         } else {
-            nextBtn.textContent = '下一題 ➡️';
-            nextBtn.onclick = nextQuestion;
+            nextBtn.textContent = '下一題 ➡️'; nextBtn.onclick = nextQuestion;
         }
     }
 
-    // ⭐ V9.5 新增：切換提示顯示
     function toggleHint() {
         const hintBox = document.getElementById('hint-box');
-        if (hintBox.style.display === 'none' || hintBox.style.display === '') {
-            hintBox.style.display = 'block';
-        } else {
-            hintBox.style.display = 'none';
-        }
+        hintBox.style.display = (hintBox.style.display === 'none' || hintBox.style.display === '') ? 'block' : 'none';
     }
 
-    function selectAnswer(idx) {
-        userAnswers[currentQuestionIndex] = idx;
-        renderQuestion();
-    }
-
-    function nextQuestion() {
-        if (userAnswers[currentQuestionIndex] === null) {
-            alert('請先選擇一個答案再繼續喔！');
-            return;
-        }
-        currentQuestionIndex++;
-        renderQuestion();
-        updateProgress();
-    }
-
-    function prevQuestion() {
-        currentQuestionIndex--;
-        renderQuestion();
-        updateProgress();
-    }
-
-    function updateProgress() {
-        const total = currentQuiz.length;
-        const percent = ((currentQuestionIndex + 1) / total) * 100;
-        document.getElementById('progress-fill').style.width = `${percent}%`;
-    }
-
+    function selectAnswer(idx) { userAnswers[currentQuestionIndex] = idx; renderQuestion(); }
+    function nextQuestion() { if (userAnswers[currentQuestionIndex] === null) { alert('請先選擇一個答案！'); return; } currentQuestionIndex++; renderQuestion(); updateProgress(); }
+    function prevQuestion() { currentQuestionIndex--; renderQuestion(); updateProgress(); }
+    function updateProgress() { document.getElementById('progress-fill').style.width = `${((currentQuestionIndex + 1) / currentQuiz.length) * 100}%`; }
+    
     function toggleStarInQuiz(qid) {
-        let stars = getStorage(STORAGE_KEY_STARS);
-        const idx = stars.indexOf(qid);
-        if (idx === -1) stars.push(qid);
-        else stars.splice(idx, 1);
-        setStorage(STORAGE_KEY_STARS, stars);
-        renderQuestion(); 
+        let stars = getStorage(STORAGE_KEY_STARS); const idx = stars.indexOf(qid);
+        if (idx === -1) { stars.push(qid); } else { stars.splice(idx, 1); }
+        setStorage(STORAGE_KEY_STARS, stars); renderQuestion();
     }
 
     function submitQuiz() {
-        if (userAnswers[currentQuestionIndex] === null) {
-            alert('請完成最後一題再交卷喔！');
-            return;
-        }
-
-        let score = 0;
-        let reviewHtml = '';
-        let doneIds = [];
-        let wrongIds = [];
-        const total = currentQuiz.length;
-        const stars = getStorage(STORAGE_KEY_STARS);
+        if (userAnswers[currentQuestionIndex] === null) { alert('請完成最後一題！'); return; }
+        let score = 0, reviewHtml = '', doneIds = [], wrongIds = [];
         
         currentQuiz.forEach((q, idx) => {
             const myAns = userAnswers[idx];
             const isCorrect = (myAns === q.ans);
-            
             doneIds.push(q.id);
-            if (isCorrect) score += (100 / total);
-            else wrongIds.push(q.id);
+            if (isCorrect) score += (100 / currentQuiz.length); else wrongIds.push(q.id);
 
-            let analysisHtml = '';
+            let optionsAndAnalysisHtml = '';
             q.options.forEach((opt, i) => {
                 const isAns = (i === q.ans);
-                const isMyAns = (i === myAns);
+                let color = '#333', weight = 'normal', mark = '', bg = '';
+                if (isAns) { color = '#1abc9c'; weight = 'bold'; mark = '✅'; bg = '#e0f2f1'; } /* 綠色 */
+                else if (i === myAns && !isCorrect) { color = '#ff6b6b'; weight = 'bold'; mark = '❌ (你選這個)'; bg = '#ffebee'; } /* 紅色 */
+                else { color = '#555'; weight = 'normal'; mark = ''; bg = '#f8f9fa'; }
                 
-                let color = '#333';
-                let weight = 'normal';
-                let mark = '';
-                let bg = ''; 
-
-                if (isAns) { 
-                    color = '#27ae60'; weight = 'bold'; mark = '✅'; 
-                    bg = '#e8f8f5';
-                } else if (isMyAns && !isCorrect) {
-                    color = '#e74c3c'; weight = 'bold'; mark = '❌ (你選這個)';
-                    bg = '#fdedec';
-                } else {
-                    color = '#555'; weight = 'normal'; mark = '';
-                    bg = '#f8f9fa'; 
+                // 結算畫面也顯示完整解析
+                let analysisText = '';
+                if (Array.isArray(q.analysis) && q.analysis[i]) {
+                    analysisText = q.analysis[i];
+                } else if (!Array.isArray(q.analysis) && isAns) {
+                    analysisText = q.analysis;
                 }
 
-                // V9.5 兼容舊資料：如果是陣列就分項顯示，如果是字串就只顯示在正確答案下
-                let analysisText = "";
-                if (Array.isArray(q.analysis)) {
-                     analysisText = q.analysis[i] || "";
-                } else {
-                     if(isAns) analysisText = q.analysis; 
-                }
-
-                analysisHtml += `
-                    <div style="margin-bottom:10px; background:${bg}; padding:10px; border-radius:8px;">
-                        <div style="color:${color}; font-weight:${weight}; font-size:1.05em;">
-                            ${String.fromCharCode(65+i)}. ${opt} ${mark}
-                        </div>
-                        ${analysisText ? `<div style="margin-top:6px; font-size:0.9em; color:#666; background:white; padding:8px 12px; border-radius:6px; border:1px solid #eee;">💡 ${analysisText}</div>` : ''}
-                    </div>
-                `;
+                optionsAndAnalysisHtml += `<div style="margin-bottom:10px; background:${bg}; padding:10px; border-radius:8px;">
+                    <div style="color:${color}; font-weight:${weight}; font-size:1.05em;">${String.fromCharCode(65+i)}. ${opt} ${mark}</div>
+                    ${analysisText ? `<div style="margin-top:6px; font-size:0.9em; color:#666; background:white; padding:8px 12px; border-radius:6px; border:1px solid #eee;">💡 ${analysisText}</div>` : ''}
+                </div>`;
             });
 
-            const isStarred = stars.includes(q.id);
-            const starText = isStarred ? '⭐ 已收藏' : '☆ 收藏';
-            const starColor = isStarred ? '#f1c40f' : '#999';
-            const starBorder = isStarred ? '#f1c40f' : '#ccc';
+            const isStarred = getStorage(STORAGE_KEY_STARS).includes(q.id);
+            const starText = isStarred ? '⭐' : '☆';
+            const starBorder = isStarred ? '#f39c12' : '#bdc3c7';
+            const starColor = isStarred ? '#f39c12' : '#999';
+            let imageHtml = q.img ? `<div style="text-align:center; margin:10px 0;"><img src="${q.img}" style="max-width:100%; max-height:200px; border-radius:5px;"></div>` : '';
             
-            let extraBtns = '';
-            extraBtns += `<button onclick="toggleStarReview(this, ${q.id})" class="btn-action-sm" style="border:1px solid ${starBorder}; color:${starColor};">${starText}</button>`;
-
-            if (currentMode === 'mistake') {
-                 extraBtns += `<button onclick="removeFromMistakeInResult(this, ${q.id})" class="btn-action-sm" style="border:1px solid #27ae60; color:#27ae60; margin-top:5px;">✅ 移除錯題</button>`;
-            }
-            
-            if (currentMode === 'star') {
-                 extraBtns += `<button onclick="removeFromStarInResult(this, ${q.id})" class="btn-action-sm" style="border:1px solid #f39c12; color:#f39c12; margin-top:5px;">❌ 移除收藏</button>`;
-            }
-
-            reviewHtml += `
-                <div class="review-item ${isCorrect ? 'correct' : 'wrong'}">
-                    <div class="review-header-row">
-                        <div class="review-q">第 ${idx+1} / ${total} 題：${q.q}</div>
-                        <div class="action-btn-group">
-                            ${extraBtns}
-                        </div>
-                    </div>
-                    <div style="margin-left:10px; font-size:0.95em;">
-                        ${analysisHtml}
-                    </div>
-                </div>
+            // ⭐ V13.7：結算畫面只有星星
+            let actionBtns = `
+                <button class="btn-action-sm" style="border:1px solid ${starBorder}; color:${starColor};" onclick="toggleStarReview(this, ${q.id})">${starText}</button>
             `;
+
+            reviewHtml += `<div class="review-item ${isCorrect ? 'correct' : 'wrong'}">
+                <div class="review-header-row"><div class="review-q">第 ${idx+1} 題：${q.q}</div><div class="action-btn-group">${actionBtns}</div></div>
+                ${imageHtml}
+                <div style="margin-left:10px; font-size:0.95em;">${optionsAndAnalysisHtml}</div>
+            </div>`;
         });
 
         let history = getStorage(STORAGE_KEY_PROGRESS);
-        let unique = new Set([...history, ...doneIds]);
-        setStorage(STORAGE_KEY_PROGRESS, [...unique]);
-
+        setStorage(STORAGE_KEY_PROGRESS, [...new Set([...history, ...doneIds])]);
         if (wrongIds.length > 0) {
-            let allMistakes = getStorage(STORAGE_KEY_MISTAKES);
-            let uniqueMistakes = new Set([...allMistakes, ...wrongIds]);
-            setStorage(STORAGE_KEY_MISTAKES, [...uniqueMistakes]);
+            let mistakes = getStorage(STORAGE_KEY_MISTAKES);
+            setStorage(STORAGE_KEY_MISTAKES, [...new Set([...mistakes, ...wrongIds])]);
         }
 
         hideAllViews();
@@ -14790,117 +14925,58 @@
         filterReview('all');
         
         const btnDiv = document.getElementById('result-buttons');
-        let retryBtnText = '🔄 再測一次 (重新抽題)';
-        let retryAction = 'startNormalQuiz()';
-        
-        if (currentMode === 'mistake') {
-            retryBtnText = '🔄 再測一次 (錯題複習)';
-            retryAction = 'startNotebookQuiz()';
-        } else if (currentMode === 'star') {
-            retryBtnText = '🔄 再測一次 (收藏複習)';
-            retryAction = 'startNotebookQuiz()';
-        }
+        let mainActionBtn = '';
+        let secondaryBtn = '';
 
+        if (currentMode === 'range') {
+            mainActionBtn = `<button class="nav-btn" style="background:#34495e;" onclick="openRangeMenu(${currentChapterIndex})">📂 回題目列表 (選其他題)</button>`;
+            secondaryBtn = `<button class="nav-btn btn-home" onclick="goHome()">🏠 回首頁</button>`;
+        } else {
+            let retryAction = '';
+            let retryText = '🔄 再測一次';
+            
+            if (currentMode === 'random') { retryAction = 'startRandomQuiz()'; retryText += ' (重新抽題)'; }
+            else if (currentMode === 'star') { retryAction = 'startNotebookQuiz()'; }
+            else if (currentMode === 'mistake') { retryAction = 'startNotebookQuiz()'; }
+
+            mainActionBtn = `<button class="nav-btn" style="background:${currentMode==='random'?'#ff9f43':'#ff6b6b'};" onclick="${retryAction}">${retryText}</button>`;
+            secondaryBtn = `<button class="nav-btn btn-home" onclick="goHome()">🏠 回首頁</button>`;
+        }
+        
         btnDiv.innerHTML = `
-            <button class="nav-btn" style="background:${currentMode==='normal'?'#3498db':'#ff9966'};" onclick="${retryAction}">${retryBtnText}</button>
-            <button class="nav-btn btn-home" onclick="goHome()">🏠 回到首頁</button>
+            ${mainActionBtn}
+            ${secondaryBtn}
         `;
-
-        const comment = document.getElementById('score-comment');
-        if (score === 100) comment.textContent = "太神啦！全部答對！🎉";
-        else if (score >= 80) comment.textContent = "很棒喔！觀念很清楚！👏";
-        else if (score >= 60) comment.textContent = "及格邊緣，再加油一下！💪";
-        else comment.textContent = "別灰心，看解析把觀念弄懂最重要！🔥";
-        
-        window.scrollTo(0, 0);
-    }
-
-    function removeFromMistakeInResult(btn, qid) {
-        if(!confirm("確定要將此題從錯題本移除嗎？")) return;
-        let mistakes = getStorage(STORAGE_KEY_MISTAKES);
-        mistakes = mistakes.filter(id => id !== qid);
-        setStorage(STORAGE_KEY_MISTAKES, mistakes);
-        btn.textContent = "已移除";
-        btn.disabled = true;
-        btn.style.background = "#eee";
-        btn.style.color = "#999";
-        btn.style.borderColor = "#ccc";
-    }
-
-    function removeFromStarInResult(btn, qid) {
-        let stars = getStorage(STORAGE_KEY_STARS);
-        stars = stars.filter(id => id !== qid);
-        setStorage(STORAGE_KEY_STARS, stars);
-        
-        btn.textContent = "已移除";
-        btn.disabled = true;
-        btn.style.background = "#eee";
-        btn.style.color = "#999";
-        btn.style.borderColor = "#ccc";
-        
-        const starBtn = btn.parentNode.querySelector('button:first-child');
-        if(starBtn) {
-            starBtn.textContent = '☆ 收藏';
-            starBtn.style.color = '#999';
-            starBtn.style.borderColor = '#ccc';
-        }
+        scrollToTop();
     }
 
     function toggleStarReview(btn, qid) {
-        let stars = getStorage(STORAGE_KEY_STARS);
-        const idx = stars.indexOf(qid);
-        if (idx === -1) {
-            stars.push(qid);
-            btn.textContent = '⭐ 已收藏';
-            btn.style.color = '#f1c40f';
-            btn.style.borderColor = '#f1c40f';
-        } else {
-            stars.splice(idx, 1);
-            btn.textContent = '☆ 收藏';
-            btn.style.color = '#999';
-            btn.style.borderColor = '#ccc';
-        }
+        let stars = getStorage(STORAGE_KEY_STARS); const idx = stars.indexOf(qid);
+        if (idx === -1) { stars.push(qid); btn.textContent = '⭐'; btn.style.color = '#f39c12'; btn.style.borderColor = '#f39c12'; }
+        else { stars.splice(idx, 1); btn.textContent = '☆'; btn.style.color = '#999'; btn.style.borderColor = '#bdc3c7'; }
         setStorage(STORAGE_KEY_STARS, stars);
     }
+    function removeFromMistakeInResult(btn, qid) { if(confirm("確定移除？")) { let m = getStorage(STORAGE_KEY_MISTAKES).filter(id => id !== qid); setStorage(STORAGE_KEY_MISTAKES, m); btn.textContent="已移除"; btn.disabled=true; } }
+    function removeFromStarInResult(btn, qid) { let s = getStorage(STORAGE_KEY_STARS).filter(id => id !== qid); setStorage(STORAGE_KEY_STARS, s); btn.textContent="已移除"; btn.disabled=true; }
 
     function filterReview(mode) {
         const items = document.querySelectorAll('.review-item');
         const btnAll = document.getElementById('btn-filter-all');
         const btnWrong = document.getElementById('btn-filter-wrong');
-        
-        if (mode === 'all') {
-            items.forEach(item => item.style.display = 'block');
-            btnAll.style.opacity = '1'; btnWrong.style.opacity = '0.6';
-        } else {
+        if (mode === 'all') { items.forEach(i => i.style.display='block'); btnAll.style.opacity='1'; btnWrong.style.opacity='0.6'; }
+        else {
             let hasWrong = false;
-            items.forEach(item => {
-                if (item.classList.contains('wrong')) {
-                    item.style.display = 'block';
-                    hasWrong = true;
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-            btnAll.style.opacity = '0.6'; btnWrong.style.opacity = '1';
-            if (!hasWrong) {
-                alert("太強了！這次沒有錯題喔！🎉");
-                filterReview('all');
-            }
+            items.forEach(i => { if(i.classList.contains('wrong')) { i.style.display='block'; hasWrong=true; } else i.style.display='none'; });
+            btnAll.style.opacity='0.6'; btnWrong.style.opacity='1';
+            if(!hasWrong) { alert("太強了！這次沒有錯題喔！🎉"); filterReview('all'); }
         }
     }
 
     function clearAllData() {
-        if(confirm("⚠️ 警告：這將會清除所有的「刷題進度」、「錯題紀錄」和「收藏題目」，且無法復原！確定要重置嗎？")) {
-            localStorage.removeItem(STORAGE_KEY_PROGRESS);
-            localStorage.removeItem(STORAGE_KEY_MISTAKES);
-            localStorage.removeItem(STORAGE_KEY_STARS);
-            alert("紀錄已重置！");
-            updateHomeStats();
-        }
+        if(confirm("⚠️ 確定要重置所有紀錄嗎？")) { localStorage.removeItem(STORAGE_KEY_PROGRESS); localStorage.removeItem(STORAGE_KEY_MISTAKES); localStorage.removeItem(STORAGE_KEY_STARS); alert("紀錄已重置！"); updateHomeStats(); renderChapterMenu(); }
     }
 
     initApp();
-
 </script>
 </body>
 </html>
