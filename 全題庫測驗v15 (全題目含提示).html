@@ -200,6 +200,15 @@
             backdrop-filter: blur(5px);
         }
         .float-btn:active { transform: scale(0.95); }
+
+	.score-number {
+        font-size: 6em;       /* 字體超大 */
+        font-weight: 800;     /* 字體加粗 */
+        color: #fff;          /* 白色字 */
+        text-shadow: 4px 4px 8px rgba(0,0,0,0.4); /* 加上陰影 */
+        margin: 10px 0;
+        line-height: 1;
+    }
     </style>
 </head>
 <body>
@@ -271,9 +280,9 @@
         <div style="font-size: 1.2em; opacity: 0.9;">參考資料區</div><div style="font-size: 1.8em; font-weight: bold; margin-top:10px;">官方簡章 & 題庫</div>
     </div>
     <div class="home-btn-grid" style="margin-top:20px;">
-        <a href="https://reurl.cc/OR4MNy" target="_blank" class="home-btn link-btn"><div><span class="icon">📄</span> 113招考簡章</div></a>
-        <a href="https://reurl.cc/3bovNV" target="_blank" class="home-btn link-btn"><div><span class="icon">📂</span> 113招考題庫</div></a>
-        <a href="https://reurl.cc/W81x5x" target="_blank" class="home-btn link-btn"><div><span class="icon">📝</span> 113年度考卷</div></a>
+        <a href="https://reurl.cc/OR4MNy" target="_blank" class="home-btn link-btn"><div><span class="icon">📄</span> 113清潔隊招考簡章</div></a>
+        <a href="https://reurl.cc/3bovNV" target="_blank" class="home-btn link-btn"><div><span class="icon">📂</span> 113清潔隊招考題庫</div></a>
+        <a href="https://reurl.cc/W81x5x" target="_blank" class="home-btn link-btn"><div><span class="icon">📝</span> 113清潔隊年度考卷</div></a>
     </div>
     <button class="nav-btn btn-home" onclick="goHome()" style="margin-top:30px;">🏠 返回首頁</button>
 </div>
@@ -14919,7 +14928,17 @@
 
         hideAllViews();
         document.getElementById('result-view').style.display = 'block';
-        document.getElementById('final-score').textContent = Math.round(score);
+        let scoreInt = Math.round(score);
+        document.getElementById('final-score').textContent = scoreInt;
+        
+        // 評語邏輯
+        let comment = '';
+        if (scoreInt === 100) comment = "太神啦！全部答對！🎉";
+        else if (scoreInt >= 80) comment = "很棒喔！繼續保持！🔥";
+        else if (scoreInt >= 60) comment = "及格了！再接再厲！💪";
+        else comment = "加油！多練習幾次就會了！📚";
+        
+        document.getElementById('score-comment').textContent = comment;
         document.getElementById('review-list').innerHTML = reviewHtml;
         
         filterReview('all');
@@ -14980,3 +14999,4 @@
 </script>
 </body>
 </html>
+
