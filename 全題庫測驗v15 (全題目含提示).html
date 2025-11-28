@@ -248,8 +248,10 @@
         </button>
     </div>
 
-    <div style="margin-top:20px; border-top:1px solid #eee; padding-top:15px; text-align:center;">
-        <button class="nav-btn" style="background-color: #bdc3c7; color: #555; font-size: 0.9em; width:auto; padding:8px 15px;" onclick="clearAllData()">🗑️ 重置所有紀錄</button>
+    <div style="margin-top:20px; border-top:1px solid #eee; padding-top:15px; text-align:center; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+        <button class="nav-btn" style="background-color: #34495e; color: white; font-size: 0.9em; width:auto; padding:8px 15px;" onclick="exportProgress()">📤 匯出進度 (換裝置用)</button>
+        <button class="nav-btn" style="background-color: #34495e; color: white; font-size: 0.9em; width:auto; padding:8px 15px;" onclick="importProgress()">📥 匯入進度</button>
+        <button class="nav-btn" style="background-color: #bdc3c7; color: #555; font-size: 0.9em; width:auto; padding:8px 15px;" onclick="clearAllData()">🗑️ 重置</button>
     </div>
 </div>
 
@@ -14995,8 +14997,53 @@
         if(confirm("⚠️ 確定要重置所有紀錄嗎？")) { localStorage.removeItem(STORAGE_KEY_PROGRESS); localStorage.removeItem(STORAGE_KEY_MISTAKES); localStorage.removeItem(STORAGE_KEY_STARS); alert("紀錄已重置！"); updateHomeStats(); renderChapterMenu(); }
     }
 
+	// ⭐ V14.0 新增：匯出進度 (產生代碼)
+    function exportProgress() {
+        const data = {
+            progress: getStorage(STORAGE_KEY_PROGRESS),
+            mistakes: getStorage(STORAGE_KEY_MISTAKES),
+            stars: getStorage(STORAGE_KEY_STARS)
+        };
+        // 把資料轉成 JSON 字串，再轉成 Base64 編碼 (看起來像亂碼，避免複製錯誤)
+        const code = btoa(JSON.stringify(data));
+        
+        // 複製到剪貼簿 (現代瀏覽器寫法)
+        navigator.clipboard.writeText(code).then(() => {
+            alert("✅ 進度代碼已複製到剪貼簿！\n\n請將此代碼傳送到您的另一台裝置，並使用「匯入進度」功能。");
+        }).catch(err => {
+            // 如果瀏覽器不支援自動複製，顯示出來讓使用者手動複製
+            prompt("請複製以下代碼 (全選 Ctrl+A -> 複製 Ctrl+C)：", code);
+        });
+    }
+
+    // ⭐ V14.0 新增：匯入進度 (讀取代碼)
+    function importProgress() {
+        const code = prompt("請貼上您之前匯出的進度代碼：");
+        if (!code) return;
+
+        try {
+            // 解碼 Base64 -> JSON -> 物件
+            const data = JSON.parse(atob(code));
+            
+            if (data.progress && data.mistakes && data.stars) {
+                if(confirm("⚠️ 匯入將會覆蓋您目前這台裝置上的紀錄，確定要匯入嗎？")) {
+                    setStorage(STORAGE_KEY_PROGRESS, data.progress);
+                    setStorage(STORAGE_KEY_MISTAKES, data.mistakes);
+                    setStorage(STORAGE_KEY_STARS, data.stars);
+                    alert("🎉 匯入成功！進度已同步！");
+                    updateHomeStats();
+                    renderChapterMenu();
+                }
+            } else {
+                alert("❌ 代碼格式錯誤，請確認是否複製完整。");
+            }
+        } catch (e) {
+            alert("❌ 無法讀取代碼，請確認是否複製完整。");
+        }
+    }
     initApp();
 </script>
 </body>
 </html>
+
 
