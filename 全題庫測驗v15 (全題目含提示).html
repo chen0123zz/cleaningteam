@@ -13709,10 +13709,29 @@
     }
 
     function startRandomQuiz() {
-        const allIds = database.map(q => q.id);
-        const selectedIds = getRandomQuestions(allIds, randomQuizSize);
-        startQuiz('random', selectedIds, false); 
+    const allIds = database.map(q => q.id);
+    const doneIds = getStorage(STORAGE_KEY_PROGRESS);
+    
+    // 還沒做過的題
+    const undonIds = allIds.filter(id => !doneIds.includes(id));
+    
+    let pool;
+    if (undonIds.length >= randomQuizSize) {
+        // 未做過的題夠用，直接從裡面抽
+        pool = undonIds;
+    } else if (undonIds.length > 0) {
+        // 未做過的不夠10題，先全加，再從做過的補足
+        const remaining = randomQuizSize - undonIds.length;
+        const extra = getRandomQuestions(doneIds, remaining);
+        pool = [...undonIds, ...extra];
+    } else {
+        // 全部做完了，從全部抽
+        pool = allIds;
     }
+    
+    const selectedIds = getRandomQuestions(pool, randomQuizSize);
+    startQuiz('random', selectedIds, false); 
+}
 
     function startRangeQuiz(startId, endId, title) {
         const ids = [];
